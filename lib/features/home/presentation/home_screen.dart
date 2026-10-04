@@ -396,9 +396,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
             // Finally, complete occurrence
             if (!context.mounted) return false;
-            await ref.read(healthRepositoryProvider).completeOccurrence(occurrence.id);
+            bool wasLast = await ref.read(healthRepositoryProvider).completeOccurrence(occurrence.id);
             ref.read(healthAgendaProvider.notifier).removeOccurrenceLocally(occurrence.id);
             ref.invalidate(healthAgendaProvider);
+            
+            if (wasLast && context.mounted) {
+              final extendResult = await showDialog<bool>(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: const Text('Último evento repetitivo'),
+                  content: const Text('Has completado el último evento generado para esta serie. ¿Deseas seguir generando eventos de este tipo por otros 2 años?'),
+                  actions: [
+                    TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('No, finalizar')),
+                    FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Sí, extender')),
+                  ],
+                ),
+              );
+              if (extendResult == true && context.mounted) {
+                await ref.read(healthRepositoryProvider).extendHealthEvent(event.petId, event.id);
+                ref.invalidate(healthAgendaProvider);
+                ref.invalidate(healthHistoryProvider(event.petId));
+              }
+            }
             return true;
           } catch (e) {
             return false;

@@ -49,15 +49,27 @@ class HealthRepository {
     return data.map((json) => HealthEventOccurrenceDto.fromJson(json)).toList();
   }
 
-  Future<List<HealthEventDto>> getHistory(String petId) async {
-    final response = await _dio.get('/pets/$petId/health-events/history');
+  Future<List<HealthEventDto>> getHistory(String petId, {int skip = 0, int take = 20}) async {
+    final response = await _dio.get('/pets/$petId/health-events/history', queryParameters: {
+      'skip': skip,
+      'take': take,
+    });
     final data = response.data as List;
     return data.map((json) => HealthEventDto.fromJson(json)).toList();
   }
 
-  Future<void> completeOccurrence(String occurrenceId) async {
+  Future<bool> completeOccurrence(String occurrenceId) async {
     final response = await _dio.patch('/HealthEventOccurrences/$occurrenceId/complete');
     if (response.statusCode != 200) throw Exception('Error completing occurrence');
+    if (response.data is Map<String, dynamic>) {
+      return response.data['wasLastOccurrence'] ?? false;
+    }
+    return false;
+  }
+
+  Future<void> extendHealthEvent(String petId, String eventId) async {
+    final response = await _dio.post('/pets/$petId/health-events/$eventId/extend');
+    if (response.statusCode != 200) throw Exception('Error extending event');
   }
 
   Future<void> postponeOccurrence(String occurrenceId, DateTime newDate) async {
