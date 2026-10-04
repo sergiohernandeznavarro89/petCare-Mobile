@@ -11,11 +11,16 @@ import 'widgets/event_speed_dial.dart';
 import 'add_health_event_bottom_sheet.dart';
 import '../data/health_repository.dart';
 
-class HealthTimelineScreen extends ConsumerWidget {
+class HealthTimelineScreen extends ConsumerStatefulWidget {
   const HealthTimelineScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HealthTimelineScreen> createState() => _HealthTimelineScreenState();
+}
+
+class _HealthTimelineScreenState extends ConsumerState<HealthTimelineScreen> {
+  @override
+  Widget build(BuildContext context) {
     final petsAsync = ref.watch(petsProvider);
     final selectedPet = ref.watch(effectivePetProvider);
     final theme = Theme.of(context);
@@ -78,7 +83,7 @@ class HealthTimelineScreen extends ConsumerWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.pets, size: 64, color: theme.colorScheme.primary.withValues(alpha: 0.5)),
+                          Icon(Icons.pets, size: 64, color: theme.colorScheme.primary.withAlpha(128)),
                           const SizedBox(height: 16),
                           Text(
                             'Selecciona una mascota arriba para ver su historial.',
@@ -103,24 +108,53 @@ class HealthTimelineScreen extends ConsumerWidget {
                         );
                       }).toList();
 
+                      final groupedEvents = <DateTime, List<HealthEventDto>>{};
+                      for (var event in parentEvents) {
+                        final localDate = event.date.toLocal();
+                        final date = DateTime(localDate.year, localDate.month, localDate.day);
+                        if (!groupedEvents.containsKey(date)) {
+                          groupedEvents[date] = [];
+                        }
+                        groupedEvents[date]!.add(event);
+                      }
+                      
+                      final sortedDates = groupedEvents.keys.toList()..sort((a, b) => b.compareTo(a));
+
                       return RefreshIndicator(
                         onRefresh: () async => ref.invalidate(healthHistoryProvider(selectedPet.id)),
-                        child: ListView.builder(
+                        child: CustomScrollView(
                           physics: const AlwaysScrollableScrollPhysics(),
-                          padding: const EdgeInsets.all(16.0),
-                          itemCount: parentEvents.length,
-                          itemBuilder: (context, index) {
-                            final parentEvent = parentEvents[index];
-                            final children = events.where((e) {
-                              return e.map(
-                                vetVisit: (v) => v.parentId == parentEvent.id,
-                                medication: (m) => m.parentId == parentEvent.id,
-                                vaccine: (v) => v.parentId == parentEvent.id,
-                                custom: (c) => c.parentId == parentEvent.id,
-                              );
-                            }).toList();
-                            return _buildTimelineItem(context, ref, parentEvent, children, theme, index == parentEvents.length - 1);
-                          },
+                          slivers: [
+                            for (final date in sortedDates)
+                              SliverMainAxisGroup(
+                                slivers: [
+                                  SliverPersistentHeader(
+                                    pinned: true,
+                                    delegate: _StickyDateHeaderDelegate(
+                                      date: date,
+                                      theme: theme,
+                                    ),
+                                  ),
+                                  SliverList(
+                                    delegate: SliverChildBuilderDelegate(
+                                      (context, index) {
+                                        final parentEvent = groupedEvents[date]![index];
+                                        final children = events.where((e) {
+                                          return e.map(
+                                            vetVisit: (v) => v.parentId == parentEvent.id,
+                                            medication: (m) => m.parentId == parentEvent.id,
+                                            vaccine: (v) => v.parentId == parentEvent.id,
+                                            custom: (c) => c.parentId == parentEvent.id,
+                                          );
+                                        }).toList();
+                                        return _buildEventCard(context, ref, parentEvent, children, theme);
+                                      },
+                                      childCount: groupedEvents[date]!.length,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                          ],
                         ),
                       );
                     },
@@ -133,8 +167,8 @@ class HealthTimelineScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildTimelineItem(BuildContext context, WidgetRef ref, HealthEventDto event, List<HealthEventDto> children, ThemeData theme, bool isLast) {
-    IconData icon = Icons.medical_services;
+  Widget _buildEventCard(BuildContext context, WidgetRef ref, HealthEventDto event, List<HealthEventDto> children, ThemeData theme) {
+    IconData icon = Icons.event;
     Color color = theme.colorScheme.primary;
 
     event.mapOrNull(
@@ -144,161 +178,109 @@ class HealthTimelineScreen extends ConsumerWidget {
       custom: (_) { icon = Icons.star; color = Colors.purple; },
     );
 
-    return IntrinsicHeight(
-      child: Row(
+    final cardContent = ListTile(
+      leading: CircleAvatar(
+        backgroundColor: color.withAlpha(51),
+        child: Icon(icon, color: color),
+      ),
+      title: Text(event.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 40,
-            child: Column(
-              children: [
-                Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.2),
-                    shape: BoxShape.circle,
-                    border: Border.all(color: color, width: 2),
-                  ),
-                  child: Icon(icon, color: color, size: 16),
+          Text(DateFormat('HH:mm').format(event.date.toLocal())),
+          if (event.notes != null && event.notes!.isNotEmpty)
+            Text(event.notes!, maxLines: 1, overflow: TextOverflow.ellipsis),
+        ],
+      ),
+      onTap: () => _showEventDetailsModal(context, event),
+    );
+
+    return Dismissible(
+      key: ValueKey(event.id),
+      direction: DismissDirection.horizontal,
+      background: Container(
+        color: Colors.blue,
+        alignment: Alignment.centerLeft,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: const Icon(Icons.edit, color: Colors.white),
+      ),
+      secondaryBackground: Container(
+        color: Colors.red,
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: const Icon(Icons.delete, color: Colors.white),
+      ),
+      confirmDismiss: (direction) async {
+        if (direction == DismissDirection.startToEnd) {
+          // Edit
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            builder: (ctx) => AddHealthEventBottomSheet(
+              petId: ref.read(effectivePetProvider)!.id,
+              existingEvent: event,
+            ),
+          );
+          return false;
+        } else {
+          // Delete
+          final confirm = await showDialog<bool>(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              title: const Text('Eliminar evento'),
+              content: const Text('¿Estás seguro de que deseas eliminar este evento?'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(false),
+                  child: const Text('Cancelar'),
                 ),
-                if (!isLast)
-                  Expanded(
-                    child: Container(
-                      width: 2,
-                      color: Colors.grey.shade300,
-                    ),
-                  ),
+                FilledButton(
+                  style: FilledButton.styleFrom(backgroundColor: Colors.red),
+                  onPressed: () => Navigator.of(ctx).pop(true),
+                  child: const Text('Eliminar'),
+                ),
               ],
             ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 24.0),
-              child: Dismissible(
-                key: ValueKey(event.id),
-                direction: DismissDirection.horizontal,
-                background: Container(
-                  alignment: Alignment.centerLeft,
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  decoration: BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: const Icon(Icons.edit, color: Colors.white),
+          );
+          if (confirm == true) {
+            final repo = ref.read(healthRepositoryProvider);
+            await repo.deleteHealthEvent(ref.read(effectivePetProvider)!.id, event.id);
+            ref.invalidate(healthAgendaProvider);
+            ref.invalidate(healthHistoryProvider(ref.read(effectivePetProvider)!.id));
+          }
+          return false;
+        }
+      },
+      child: Card(
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        elevation: 1,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: children.isEmpty
+            ? cardContent
+            : ExpansionTile(
+                shape: const Border(),
+                leading: CircleAvatar(
+                  backgroundColor: color.withAlpha(51),
+                  child: Icon(icon, color: color),
                 ),
-                secondaryBackground: Container(
-                  alignment: Alignment.centerRight,
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: const Icon(Icons.delete, color: Colors.white),
+                title: Text(event.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(DateFormat('HH:mm').format(event.date.toLocal())),
+                    if (event.notes != null && event.notes!.isNotEmpty)
+                      Text(event.notes!, maxLines: 1, overflow: TextOverflow.ellipsis),
+                  ],
                 ),
-                confirmDismiss: (direction) async {
-                  if (direction == DismissDirection.startToEnd) {
-                    // Edit
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                      ),
-                      builder: (ctx) => AddHealthEventBottomSheet(
-                        petId: ref.read(effectivePetProvider)!.id,
-                        existingEvent: event,
-                      ),
-                    );
-                    return false;
-                  } else {
-                    // Delete
-                    final confirm = await showDialog<bool>(
-                      context: context,
-                      builder: (ctx) => AlertDialog(
-                        title: const Text('Eliminar evento'),
-                        content: const Text('¿Estás seguro de que deseas eliminar este evento?'),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.of(ctx).pop(false),
-                            child: const Text('Cancelar'),
-                          ),
-                          FilledButton(
-                            style: FilledButton.styleFrom(backgroundColor: Colors.red),
-                            onPressed: () => Navigator.of(ctx).pop(true),
-                            child: const Text('Eliminar'),
-                          ),
-                        ],
-                      ),
-                    );
-                    if (confirm == true) {
-                      final repo = ref.read(healthRepositoryProvider);
-                      await repo.deleteHealthEvent(ref.read(effectivePetProvider)!.id, event.id);
-                      ref.invalidate(healthAgendaProvider);
-                      ref.invalidate(healthHistoryProvider(ref.read(effectivePetProvider)!.id));
-                    }
-                    return false;
-                  }
-                },
-                child: Card(
-                  elevation: 0,
-                  margin: EdgeInsets.zero,
-                  color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    side: BorderSide(color: Colors.grey.shade200),
-                  ),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(16),
-                    onTap: () => _showEventDetailsModal(context, event),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  event.title,
-                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                                ),
-                              ),
-                              Text(
-                                DateFormat('dd MMM yy').format(event.date),
-                                style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          if (event.notes != null && event.notes!.isNotEmpty)
-                            Text(event.notes!, style: TextStyle(color: Colors.grey.shade700)),
-                          if (event.weight != null) ...[
-                            const SizedBox(height: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: Colors.green.shade50,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text('Peso: ${event.weight} kg', style: TextStyle(color: Colors.green.shade700, fontWeight: FontWeight.bold, fontSize: 12)),
-                            ),
-                          ],
-                          if (children.isNotEmpty) ...[
-                            const SizedBox(height: 12),
-                            const Divider(),
-                            ...children.map((child) => _buildChildEvent(child, theme)),
-                          ]
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-            ),
-          ),
-          ),
-        ],
+                children: [
+                  const Divider(height: 1),
+                  ...children.map((child) => _buildChildEvent(child, theme)),
+                  const SizedBox(height: 8),
+                ],
+              ),
       ),
     );
   }
@@ -313,29 +295,16 @@ class HealthTimelineScreen extends ConsumerWidget {
       custom: (_) { icon = Icons.star; color = Colors.purple; },
     );
 
-    return Padding(
-      padding: const EdgeInsets.only(top: 8.0),
-      child: Row(
-        children: [
-          Icon(Icons.subdirectory_arrow_right, size: 16, color: Colors.grey.shade400),
-          const SizedBox(width: 8),
-          CircleAvatar(
-            radius: 12,
-            backgroundColor: color.withValues(alpha: 0.2),
-            child: Icon(icon, color: color, size: 12),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(child.title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
-                Text(DateFormat('dd MMM yy').format(child.date), style: TextStyle(color: Colors.grey.shade600, fontSize: 11)),
-              ],
-            ),
-          ),
-        ],
+    return ListTile(
+      contentPadding: const EdgeInsets.only(left: 72, right: 16),
+      leading: CircleAvatar(
+        radius: 16,
+        backgroundColor: color.withAlpha(51),
+        child: Icon(icon, color: color, size: 16),
       ),
+      title: Text(child.title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+      subtitle: Text(DateFormat('dd MMM yy - HH:mm').format(child.date.toLocal()), style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+      onTap: () => _showEventDetailsModal(context, child),
     );
   }
 
@@ -394,7 +363,7 @@ class HealthTimelineScreen extends ConsumerWidget {
                   if (occurrences.isNotEmpty) ...[
                     const Divider(),
                     const SizedBox(height: 8),
-                    Text('Eventos Hijos (${occurrences.length})', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                    Text('Eventos Repetitivos (${occurrences.length})', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
                     const SizedBox(height: 12),
                     Expanded(
                       child: ListView.separated(
@@ -406,7 +375,7 @@ class HealthTimelineScreen extends ConsumerWidget {
                           return ListTile(
                             contentPadding: EdgeInsets.zero,
                             leading: CircleAvatar(
-                              backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                              backgroundColor: Theme.of(context).colorScheme.primary.withAlpha(25),
                               child: Icon(Icons.event_repeat, color: Theme.of(context).colorScheme.primary),
                             ),
                             title: Text(DateFormat('dd MMM yyyy - HH:mm').format(occ.date)),
@@ -428,5 +397,40 @@ class HealthTimelineScreen extends ConsumerWidget {
         );
       },
     );
+  }
+}
+
+class _StickyDateHeaderDelegate extends SliverPersistentHeaderDelegate {
+  final DateTime date;
+  final ThemeData theme;
+
+  _StickyDateHeaderDelegate({required this.date, required this.theme});
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    final dateStr = DateFormat('dd MMM yyyy').format(date);
+    return Container(
+      color: theme.scaffoldBackgroundColor,
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+      alignment: Alignment.centerLeft,
+      child: Text(
+        dateStr.toUpperCase(),
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          color: theme.colorScheme.primary,
+        ),
+      ),
+    );
+  }
+
+  @override
+  double get maxExtent => 40.0;
+
+  @override
+  double get minExtent => 40.0;
+
+  @override
+  bool shouldRebuild(covariant _StickyDateHeaderDelegate oldDelegate) {
+    return oldDelegate.date != date;
   }
 }
