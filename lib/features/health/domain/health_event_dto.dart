@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'event_type_definition_dto.dart';
+import 'health_event_occurrence_dto.dart';
 
 part 'health_event_dto.freezed.dart';
 part 'health_event_dto.g.dart';
@@ -22,6 +23,9 @@ sealed class HealthEventDto with _$HealthEventDto {
     @Default(false) bool isHospitalization,
     DateTime? dischargeDate,
     String? parentId,
+    @Default(false) bool hasCompletedOccurrences,
+    DateTime? endDate,
+    List<HealthEventOccurrenceDto>? occurrences,
   }) = VetVisitEventDto;
 
   @FreezedUnionValue('Medication')
@@ -38,8 +42,10 @@ sealed class HealthEventDto with _$HealthEventDto {
     required int frequencyValue,
     required int frequencyUnit,
     required DateTime startDate,
-    DateTime? endDate,
     String? parentId,
+    @Default(false) bool hasCompletedOccurrences,
+    DateTime? endDate,
+    List<HealthEventOccurrenceDto>? occurrences,
   }) = MedicationEventDto;
 
   @FreezedUnionValue('Vaccine')
@@ -55,6 +61,9 @@ sealed class HealthEventDto with _$HealthEventDto {
     required int frequencyValue,
     required int frequencyUnit,
     String? parentId,
+    @Default(false) bool hasCompletedOccurrences,
+    DateTime? endDate,
+    List<HealthEventOccurrenceDto>? occurrences,
   }) = VaccineEventDto;
 
   @FreezedUnionValue('Custom')
@@ -69,6 +78,9 @@ sealed class HealthEventDto with _$HealthEventDto {
     required int frequencyValue,
     required int frequencyUnit,
     String? parentId,
+    @Default(false) bool hasCompletedOccurrences,
+    DateTime? endDate,
+    List<HealthEventOccurrenceDto>? occurrences,
   }) = CustomHealthEventDto;
 
   factory HealthEventDto.fromJson(Map<String, dynamic> json) =>
@@ -113,16 +125,16 @@ extension HealthEventDtoOccurrences on HealthEventDto {
       } else if (fUnit == 1) {
         current = current.add(Duration(days: fVal));
       } else if (fUnit == 2) {
-        current = current.add(Duration(days: fVal * 7));
-      } else if (fUnit == 3) {
         int nextMonth = current.month + fVal;
         int nextYear = current.year + (nextMonth - 1) ~/ 12;
         nextMonth = (nextMonth - 1) % 12 + 1;
         int daysInNextMonth = DateTime(nextYear, nextMonth + 1, 0).day;
         int nextDay = current.day > daysInNextMonth ? daysInNextMonth : current.day;
         current = DateTime(nextYear, nextMonth, nextDay, current.hour, current.minute);
-      } else if (fUnit == 4) {
+      } else if (fUnit == 3) {
         current = DateTime(current.year + fVal, current.month, current.day, current.hour, current.minute);
+      } else if (fUnit == 4) {
+        current = current.add(Duration(days: fVal * 7));
       } else {
         break; // Fallback to avoid infinite loop
       }

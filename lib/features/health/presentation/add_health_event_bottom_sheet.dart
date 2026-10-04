@@ -49,6 +49,7 @@ class _AddHealthEventBottomSheetState extends ConsumerState<AddHealthEventBottom
   int _frequencyValue = 1;
   int _frequencyUnit = 1;
   bool _isRecurring = false;
+  DateTime? _endDate;
   
   bool _isLoading = false;
 
@@ -68,6 +69,7 @@ class _AddHealthEventBottomSheetState extends ConsumerState<AddHealthEventBottom
           _clinicName = v.clinicName ?? '';
           _vetName = v.veterinarianName ?? '';
           _isHospitalization = v.isHospitalization;
+          _endDate = v.endDate;
         },
         medication: (m) {
           _drugName = m.drugName;
@@ -75,12 +77,20 @@ class _AddHealthEventBottomSheetState extends ConsumerState<AddHealthEventBottom
             _frequencyValue = m.frequencyValue == 0 ? 1 : m.frequencyValue;
             _frequencyUnit = m.frequencyUnit;
             _isRecurring = m.frequencyValue > 0;
+            _endDate = m.endDate;
         },
         vaccine: (v) {
             _vaccineName = v.vaccineName;
             _frequencyValue = v.frequencyValue == 0 ? 1 : v.frequencyValue;
             _frequencyUnit = v.frequencyUnit;
             _isRecurring = v.frequencyValue > 0;
+            _endDate = v.endDate;
+        },
+        custom: (c) {
+            _frequencyValue = c.frequencyValue == 0 ? 1 : c.frequencyValue;
+            _frequencyUnit = c.frequencyUnit;
+            _isRecurring = c.frequencyValue > 0;
+            _endDate = c.endDate;
         },
       );
     } else if (!widget.isCustomMode && widget.preselectedEventType != null) {
@@ -287,17 +297,33 @@ class _AddHealthEventBottomSheetState extends ConsumerState<AddHealthEventBottom
                               subtitle: Text(DateFormat('dd/MM/yyyy HH:mm').format(_date)),
                               trailing: const Icon(Icons.calendar_today),
                               shape: RoundedRectangleBorder(side: BorderSide(color: Colors.grey.shade400), borderRadius: BorderRadius.circular(4)),
-                              onTap: () async {
+                              enabled: widget.existingEvent == null || !widget.existingEvent!.hasCompletedOccurrences,
+                              onTap: widget.existingEvent != null && widget.existingEvent!.hasCompletedOccurrences ? null : () async {
                                 final d = await showDatePicker(context: context, initialDate: _date, firstDate: DateTime(2000), lastDate: DateTime(2100));
                                 if (d != null) {
                                   if (!mounted) return;
-                                  final t = await showTimePicker(context: context, initialTime: TimeOfDay.fromDateTime(_date));
+                                  final t = await showTimePicker(
+                                    context: context, 
+                                    initialTime: TimeOfDay.fromDateTime(_date),
+                                    builder: (context, child) => MediaQuery(
+                                      data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+                                      child: child!,
+                                    ),
+                                  );
                                   if (t != null) {
                                     setState(() => _date = DateTime(d.year, d.month, d.day, t.hour, t.minute));
                                   }
                                 }
                               },
                             ),
+                            if (widget.existingEvent != null && widget.existingEvent!.hasCompletedOccurrences)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 4, bottom: 8),
+                                child: Text(
+                                  'La fecha y hora no se pueden editar porque ya hay registros completados para este evento.',
+                                  style: TextStyle(color: Colors.red.shade700, fontSize: 12),
+                                ),
+                              ),
                             const SizedBox(height: 16),
                             
                             if (_selectedEventType?.name.toLowerCase().contains('visita') == true) ...[
@@ -357,6 +383,7 @@ class _AddHealthEventBottomSheetState extends ConsumerState<AddHealthEventBottom
                                         items: const [
                                           DropdownMenuItem(value: 0, child: Text('Horas')),
                                           DropdownMenuItem(value: 1, child: Text('Días')),
+                                          DropdownMenuItem(value: 4, child: Text('Semanas')),
                                           DropdownMenuItem(value: 2, child: Text('Meses')),
                                           DropdownMenuItem(value: 3, child: Text('Años')),
                                         ],
@@ -366,6 +393,36 @@ class _AddHealthEventBottomSheetState extends ConsumerState<AddHealthEventBottom
                                       ),
                                     ),
                                   ],
+                                ),
+                                const SizedBox(height: 12),
+                                ListTile(
+                                  title: const Text('Fecha Fin (Opcional)'),
+                                  subtitle: Text(_endDate != null ? DateFormat('dd/MM/yyyy HH:mm').format(_endDate!) : 'Sin límite de fecha'),
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      if (_endDate != null)
+                                        IconButton(
+                                          icon: const Icon(Icons.clear),
+                                          onPressed: () => setState(() => _endDate = null),
+                                        ),
+                                      const Icon(Icons.calendar_today),
+                                    ],
+                                  ),
+                                  shape: RoundedRectangleBorder(side: BorderSide(color: Colors.grey.shade400), borderRadius: BorderRadius.circular(4)),
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                                  onTap: () async {
+                                    final d = await showDatePicker(context: context, initialDate: _endDate ?? _date.add(const Duration(days: 1)), firstDate: _date, lastDate: DateTime(2100));
+                                    if (d != null) {
+                                      if (!mounted) return;
+                                      final t = await showTimePicker(
+                                        context: context, 
+                                        initialTime: TimeOfDay.fromDateTime(_endDate ?? _date),
+                                        builder: (context, child) => MediaQuery(data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true), child: child!),
+                                      );
+                                      if (t != null) setState(() => _endDate = DateTime(d.year, d.month, d.day, t.hour, t.minute));
+                                    }
+                                  },
                                 ),
                               ],
                             ] else if (_selectedEventType?.name.toLowerCase().contains('vacun') == true) ...[
@@ -402,6 +459,7 @@ class _AddHealthEventBottomSheetState extends ConsumerState<AddHealthEventBottom
                                         items: const [
                                           DropdownMenuItem(value: 0, child: Text('Horas')),
                                           DropdownMenuItem(value: 1, child: Text('Días')),
+                                          DropdownMenuItem(value: 4, child: Text('Semanas')),
                                           DropdownMenuItem(value: 2, child: Text('Meses')),
                                           DropdownMenuItem(value: 3, child: Text('Años')),
                                         ],
@@ -411,6 +469,36 @@ class _AddHealthEventBottomSheetState extends ConsumerState<AddHealthEventBottom
                                       ),
                                     ),
                                   ],
+                                ),
+                                const SizedBox(height: 12),
+                                ListTile(
+                                  title: const Text('Fecha Fin (Opcional)'),
+                                  subtitle: Text(_endDate != null ? DateFormat('dd/MM/yyyy HH:mm').format(_endDate!) : 'Sin límite de fecha'),
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      if (_endDate != null)
+                                        IconButton(
+                                          icon: const Icon(Icons.clear),
+                                          onPressed: () => setState(() => _endDate = null),
+                                        ),
+                                      const Icon(Icons.calendar_today),
+                                    ],
+                                  ),
+                                  shape: RoundedRectangleBorder(side: BorderSide(color: Colors.grey.shade400), borderRadius: BorderRadius.circular(4)),
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                                  onTap: () async {
+                                    final d = await showDatePicker(context: context, initialDate: _endDate ?? _date.add(const Duration(days: 1)), firstDate: _date, lastDate: DateTime(2100));
+                                    if (d != null) {
+                                      if (!mounted) return;
+                                      final t = await showTimePicker(
+                                        context: context, 
+                                        initialTime: TimeOfDay.fromDateTime(_endDate ?? _date),
+                                        builder: (context, child) => MediaQuery(data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true), child: child!),
+                                      );
+                                      if (t != null) setState(() => _endDate = DateTime(d.year, d.month, d.day, t.hour, t.minute));
+                                    }
+                                  },
                                 ),
                               ],
                             ] else if (widget.isCustomMode) ...[
@@ -441,6 +529,7 @@ class _AddHealthEventBottomSheetState extends ConsumerState<AddHealthEventBottom
                                         items: const [
                                           DropdownMenuItem(value: 0, child: Text('Horas')),
                                           DropdownMenuItem(value: 1, child: Text('Días')),
+                                          DropdownMenuItem(value: 4, child: Text('Semanas')),
                                           DropdownMenuItem(value: 2, child: Text('Meses')),
                                           DropdownMenuItem(value: 3, child: Text('Años')),
                                         ],
@@ -450,6 +539,36 @@ class _AddHealthEventBottomSheetState extends ConsumerState<AddHealthEventBottom
                                       ),
                                     ),
                                   ],
+                                ),
+                                const SizedBox(height: 12),
+                                ListTile(
+                                  title: const Text('Fecha Fin (Opcional)'),
+                                  subtitle: Text(_endDate != null ? DateFormat('dd/MM/yyyy HH:mm').format(_endDate!) : 'Sin límite de fecha'),
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      if (_endDate != null)
+                                        IconButton(
+                                          icon: const Icon(Icons.clear),
+                                          onPressed: () => setState(() => _endDate = null),
+                                        ),
+                                      const Icon(Icons.calendar_today),
+                                    ],
+                                  ),
+                                  shape: RoundedRectangleBorder(side: BorderSide(color: Colors.grey.shade400), borderRadius: BorderRadius.circular(4)),
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                                  onTap: () async {
+                                    final d = await showDatePicker(context: context, initialDate: _endDate ?? _date.add(const Duration(days: 1)), firstDate: _date, lastDate: DateTime(2100));
+                                    if (d != null) {
+                                      if (!mounted) return;
+                                      final t = await showTimePicker(
+                                        context: context, 
+                                        initialTime: TimeOfDay.fromDateTime(_endDate ?? _date),
+                                        builder: (context, child) => MediaQuery(data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true), child: child!),
+                                      );
+                                      if (t != null) setState(() => _endDate = DateTime(d.year, d.month, d.day, t.hour, t.minute));
+                                    }
+                                  },
                                 ),
                               ],
                             ],
@@ -502,22 +621,22 @@ class _AddHealthEventBottomSheetState extends ConsumerState<AddHealthEventBottom
       if (name.contains('visita')) {
         dto = HealthEventDto.vetVisit(
           id: '00000000-0000-0000-0000-000000000000', petId: petId, eventType: _selectedEventType!, date: _date, title: _title, notes: _notes, weight: _weight,
-          clinicName: _clinicName, veterinarianName: _vetName, isHospitalization: _isHospitalization, parentId: widget.parentId
+          clinicName: _clinicName, veterinarianName: _vetName, isHospitalization: _isHospitalization, parentId: widget.parentId, endDate: _endDate
         );
       } else if (name.contains('medic')) {
         dto = HealthEventDto.medication(
           id: '00000000-0000-0000-0000-000000000000', petId: petId, eventType: _selectedEventType!, date: _date, title: _title, notes: _notes, weight: _weight,
-          drugName: _drugName, dosage: _dosage, frequencyValue: _isRecurring ? _frequencyValue : 0, frequencyUnit: _frequencyUnit, startDate: _date, parentId: widget.parentId
+          drugName: _drugName, dosage: _dosage, frequencyValue: _isRecurring ? _frequencyValue : 0, frequencyUnit: _frequencyUnit, startDate: _date, parentId: widget.parentId, endDate: _endDate
         );
       } else if (name.contains('vacun')) {
         dto = HealthEventDto.vaccine(
           id: '00000000-0000-0000-0000-000000000000', petId: petId, eventType: _selectedEventType!, date: _date, title: _title, notes: _notes, weight: _weight,
-          vaccineName: _vaccineName, frequencyValue: _isRecurring ? _frequencyValue : 0, frequencyUnit: _frequencyUnit, parentId: widget.parentId
+          vaccineName: _vaccineName, frequencyValue: _isRecurring ? _frequencyValue : 0, frequencyUnit: _frequencyUnit, parentId: widget.parentId, endDate: _endDate
         );
       } else {
         dto = HealthEventDto.custom(
           id: '00000000-0000-0000-0000-000000000000', petId: petId, eventType: _selectedEventType!, date: _date, title: _title, notes: _notes, weight: _weight,
-          frequencyValue: _isRecurring ? _frequencyValue : 0, frequencyUnit: _frequencyUnit, parentId: widget.parentId
+          frequencyValue: _isRecurring ? _frequencyValue : 0, frequencyUnit: _frequencyUnit, parentId: widget.parentId, endDate: _endDate
         );
       }
 

@@ -61,12 +61,44 @@ class HealthAgenda extends _$HealthAgenda {
   }
 }
 
-// --- Health History Provider (Timeline Screen) ---
-final healthHistoryProvider = FutureProvider.autoDispose.family<List<HealthEventDto>, String>((ref, petId) async {
-  final repository = ref.watch(healthRepositoryProvider);
-  final events = await repository.getHistory(petId);
-  
-  final sortedEvents = List<HealthEventDto>.from(events);
-  sortedEvents.sort((a, b) => b.date.compareTo(a.date));
-  return sortedEvents;
-});
+@riverpod
+class HealthHistory extends _$HealthHistory {
+  int _skip = 0;
+  final int _take = 20;
+  bool hasMore = true;
+
+  @override
+  Future<List<HealthEventDto>> build(String petId) async {
+    _skip = 0;
+    hasMore = true;
+    final repository = ref.watch(healthRepositoryProvider);
+    final initialItems = await repository.getHistory(petId, skip: _skip, take: _take);
+    if (initialItems.length < _take) {
+      hasMore = false;
+    }
+    final sortedEvents = List<HealthEventDto>.from(initialItems);
+    sortedEvents.sort((a, b) => b.date.compareTo(a.date));
+    return sortedEvents;
+  }
+
+  Future<void> fetchNextPage() async {
+    if (!hasMore) return;
+    _skip += _take;
+    
+    try {
+      final repository = ref.read(healthRepositoryProvider);
+      
+      final newItems = await repository.getHistory(petId, skip: _skip, take: _take);
+      if (newItems.length < _take) {
+        hasMore = false;
+      }
+      
+      final currentList = state.value ?? [];
+      final allItems = [...currentList, ...newItems];
+      allItems.sort((a, b) => b.date.compareTo(a.date));
+      state = AsyncValue.data(allItems);
+    } catch (e, st) {
+      // Handle error
+    }
+  }
+}

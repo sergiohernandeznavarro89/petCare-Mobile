@@ -14,5 +14,6 @@ Este archivo contiene las directrices, reglas de estilo y buenas prácticas que 
 - **Mobile First & Responsive:** Todas las pantallas deben diseñarse pensando primero en dispositivos móviles, asegurando que los teclados virtuales no oculten campos de texto importantes (usa vistas con scroll) y priorizando modales inferiores (`BottomSheets`) para flujos secundarios en lugar de diálogos disruptivos.
 
 ## 3. Flujo de Trabajo y Herramientas
+- **Control de Versiones (Git):** NUNCA ejecutes `git commit`, `git push` ni generes una Pull Request (PR) automáticamente a menos que yo te lo indique explícitamente. Limítate a escribir el código y esperar mi confirmación.
 - **Generación de Código Automática:** Recuerda SIEMPRE ejecutar `dart run build_runner build -d` cada vez que modifiques o crees un modelo `Freezed`, un proveedor `Riverpod` o llamadas de red con generación de código.
 - **Enrutamiento Centralizado:** Utiliza exclusivamente `GoRouter` para la navegación de la aplicación y pasa siempre parámetros a las rutas a través del sistema de enrutamiento fuertemente tipado si es posible.

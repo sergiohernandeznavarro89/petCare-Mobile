@@ -47,7 +47,7 @@ HealthEventDto _$HealthEventDtoFromJson(
 /// @nodoc
 mixin _$HealthEventDto {
 
- String get id; String get petId; EventTypeDefinitionDto get eventType; DateTime get date; String get title; String? get notes; double? get weight; String? get parentId;
+ String get id; String get petId; EventTypeDefinitionDto get eventType; DateTime get date; String get title; String? get notes; double? get weight; String? get parentId; bool get hasCompletedOccurrences; DateTime? get endDate; List<HealthEventOccurrenceDto>? get occurrences;
 /// Create a copy of HealthEventDto
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -61,20 +61,20 @@ $HealthEventDtoCopyWith<HealthEventDto> get copyWith => _$HealthEventDtoCopyWith
 @override
 bool operator ==(Object other) {
   final _this = this as HealthEventDto;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is HealthEventDto&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.petId, _this.petId) || other.petId == _this.petId)&&(identical(other.eventType, _this.eventType) || other.eventType == _this.eventType)&&(identical(other.date, _this.date) || other.date == _this.date)&&(identical(other.title, _this.title) || other.title == _this.title)&&(identical(other.notes, _this.notes) || other.notes == _this.notes)&&(identical(other.weight, _this.weight) || other.weight == _this.weight)&&(identical(other.parentId, _this.parentId) || other.parentId == _this.parentId));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is HealthEventDto&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.petId, _this.petId) || other.petId == _this.petId)&&(identical(other.eventType, _this.eventType) || other.eventType == _this.eventType)&&(identical(other.date, _this.date) || other.date == _this.date)&&(identical(other.title, _this.title) || other.title == _this.title)&&(identical(other.notes, _this.notes) || other.notes == _this.notes)&&(identical(other.weight, _this.weight) || other.weight == _this.weight)&&(identical(other.parentId, _this.parentId) || other.parentId == _this.parentId)&&(identical(other.hasCompletedOccurrences, _this.hasCompletedOccurrences) || other.hasCompletedOccurrences == _this.hasCompletedOccurrences)&&(identical(other.endDate, _this.endDate) || other.endDate == _this.endDate)&&const DeepCollectionEquality().equals(other.occurrences, _this.occurrences));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as HealthEventDto;
-  return Object.hash(runtimeType,_this.id,_this.petId,_this.eventType,_this.date,_this.title,_this.notes,_this.weight,_this.parentId);
+  return Object.hash(runtimeType,_this.id,_this.petId,_this.eventType,_this.date,_this.title,_this.notes,_this.weight,_this.parentId,_this.hasCompletedOccurrences,_this.endDate,const DeepCollectionEquality().hash(_this.occurrences));
 }
 
 @override
 String toString() {
   final _this = this as HealthEventDto;
-  return 'HealthEventDto(id: ${_this.id}, petId: ${_this.petId}, eventType: ${_this.eventType}, date: ${_this.date}, title: ${_this.title}, notes: ${_this.notes}, weight: ${_this.weight}, parentId: ${_this.parentId})';
+  return 'HealthEventDto(id: ${_this.id}, petId: ${_this.petId}, eventType: ${_this.eventType}, date: ${_this.date}, title: ${_this.title}, notes: ${_this.notes}, weight: ${_this.weight}, parentId: ${_this.parentId}, hasCompletedOccurrences: ${_this.hasCompletedOccurrences}, endDate: ${_this.endDate}, occurrences: ${_this.occurrences})';
 }
 
 
@@ -85,7 +85,7 @@ abstract mixin class $HealthEventDtoCopyWith<$Res>  {
   factory $HealthEventDtoCopyWith(HealthEventDto value, $Res Function(HealthEventDto) _then) = _$HealthEventDtoCopyWithImpl;
 @useResult
 $Res call({
- String id, String petId, EventTypeDefinitionDto eventType, DateTime date, String title, String? notes, double? weight, String? parentId
+ String id, String petId, EventTypeDefinitionDto eventType, DateTime date, String title, String? notes, double? weight, String? parentId, bool hasCompletedOccurrences, DateTime? endDate, List<HealthEventOccurrenceDto>? occurrences
 });
 
 
@@ -102,7 +102,7 @@ class _$HealthEventDtoCopyWithImpl<$Res>
 
 /// Create a copy of HealthEventDto
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? petId = null,Object? eventType = null,Object? date = null,Object? title = null,Object? notes = freezed,Object? weight = freezed,Object? parentId = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? petId = null,Object? eventType = null,Object? date = null,Object? title = null,Object? notes = freezed,Object? weight = freezed,Object? parentId = freezed,Object? hasCompletedOccurrences = null,Object? endDate = freezed,Object? occurrences = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,petId: null == petId ? _self.petId : petId // ignore: cast_nullable_to_non_nullable
@@ -112,7 +112,10 @@ as DateTime,title: null == title ? _self.title : title // ignore: cast_nullable_
 as String,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
 as String?,weight: freezed == weight ? _self.weight : weight // ignore: cast_nullable_to_non_nullable
 as double?,parentId: freezed == parentId ? _self.parentId : parentId // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,hasCompletedOccurrences: null == hasCompletedOccurrences ? _self.hasCompletedOccurrences : hasCompletedOccurrences // ignore: cast_nullable_to_non_nullable
+as bool,endDate: freezed == endDate ? _self.endDate : endDate // ignore: cast_nullable_to_non_nullable
+as DateTime?,occurrences: freezed == occurrences ? _self.occurrences : occurrences // ignore: cast_nullable_to_non_nullable
+as List<HealthEventOccurrenceDto>?,
   ));
 }
 /// Create a copy of HealthEventDto
@@ -212,13 +215,13 @@ return custom(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String id,  String petId,  EventTypeDefinitionDto eventType,  DateTime date,  String title,  String? notes,  double? weight,  String? veterinarianName,  String? clinicName,  String? diagnosis,  bool isHospitalization,  DateTime? dischargeDate,  String? parentId)?  vetVisit,TResult Function( String id,  String petId,  EventTypeDefinitionDto eventType,  DateTime date,  String title,  String? notes,  double? weight,  String drugName,  String dosage,  int frequencyValue,  int frequencyUnit,  DateTime startDate,  DateTime? endDate,  String? parentId)?  medication,TResult Function( String id,  String petId,  EventTypeDefinitionDto eventType,  DateTime date,  String title,  String? notes,  double? weight,  String vaccineName,  int frequencyValue,  int frequencyUnit,  String? parentId)?  vaccine,TResult Function( String id,  String petId,  EventTypeDefinitionDto eventType,  DateTime date,  String title,  String? notes,  double? weight,  int frequencyValue,  int frequencyUnit,  String? parentId)?  custom,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String id,  String petId,  EventTypeDefinitionDto eventType,  DateTime date,  String title,  String? notes,  double? weight,  String? veterinarianName,  String? clinicName,  String? diagnosis,  bool isHospitalization,  DateTime? dischargeDate,  String? parentId,  bool hasCompletedOccurrences,  DateTime? endDate,  List<HealthEventOccurrenceDto>? occurrences)?  vetVisit,TResult Function( String id,  String petId,  EventTypeDefinitionDto eventType,  DateTime date,  String title,  String? notes,  double? weight,  String drugName,  String dosage,  int frequencyValue,  int frequencyUnit,  DateTime startDate,  String? parentId,  bool hasCompletedOccurrences,  DateTime? endDate,  List<HealthEventOccurrenceDto>? occurrences)?  medication,TResult Function( String id,  String petId,  EventTypeDefinitionDto eventType,  DateTime date,  String title,  String? notes,  double? weight,  String vaccineName,  int frequencyValue,  int frequencyUnit,  String? parentId,  bool hasCompletedOccurrences,  DateTime? endDate,  List<HealthEventOccurrenceDto>? occurrences)?  vaccine,TResult Function( String id,  String petId,  EventTypeDefinitionDto eventType,  DateTime date,  String title,  String? notes,  double? weight,  int frequencyValue,  int frequencyUnit,  String? parentId,  bool hasCompletedOccurrences,  DateTime? endDate,  List<HealthEventOccurrenceDto>? occurrences)?  custom,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case VetVisitEventDto() when vetVisit != null:
-return vetVisit(_that.id,_that.petId,_that.eventType,_that.date,_that.title,_that.notes,_that.weight,_that.veterinarianName,_that.clinicName,_that.diagnosis,_that.isHospitalization,_that.dischargeDate,_that.parentId);case MedicationEventDto() when medication != null:
-return medication(_that.id,_that.petId,_that.eventType,_that.date,_that.title,_that.notes,_that.weight,_that.drugName,_that.dosage,_that.frequencyValue,_that.frequencyUnit,_that.startDate,_that.endDate,_that.parentId);case VaccineEventDto() when vaccine != null:
-return vaccine(_that.id,_that.petId,_that.eventType,_that.date,_that.title,_that.notes,_that.weight,_that.vaccineName,_that.frequencyValue,_that.frequencyUnit,_that.parentId);case CustomHealthEventDto() when custom != null:
-return custom(_that.id,_that.petId,_that.eventType,_that.date,_that.title,_that.notes,_that.weight,_that.frequencyValue,_that.frequencyUnit,_that.parentId);case _:
+return vetVisit(_that.id,_that.petId,_that.eventType,_that.date,_that.title,_that.notes,_that.weight,_that.veterinarianName,_that.clinicName,_that.diagnosis,_that.isHospitalization,_that.dischargeDate,_that.parentId,_that.hasCompletedOccurrences,_that.endDate,_that.occurrences);case MedicationEventDto() when medication != null:
+return medication(_that.id,_that.petId,_that.eventType,_that.date,_that.title,_that.notes,_that.weight,_that.drugName,_that.dosage,_that.frequencyValue,_that.frequencyUnit,_that.startDate,_that.parentId,_that.hasCompletedOccurrences,_that.endDate,_that.occurrences);case VaccineEventDto() when vaccine != null:
+return vaccine(_that.id,_that.petId,_that.eventType,_that.date,_that.title,_that.notes,_that.weight,_that.vaccineName,_that.frequencyValue,_that.frequencyUnit,_that.parentId,_that.hasCompletedOccurrences,_that.endDate,_that.occurrences);case CustomHealthEventDto() when custom != null:
+return custom(_that.id,_that.petId,_that.eventType,_that.date,_that.title,_that.notes,_that.weight,_that.frequencyValue,_that.frequencyUnit,_that.parentId,_that.hasCompletedOccurrences,_that.endDate,_that.occurrences);case _:
   return orElse();
 
 }
@@ -236,13 +239,13 @@ return custom(_that.id,_that.petId,_that.eventType,_that.date,_that.title,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String id,  String petId,  EventTypeDefinitionDto eventType,  DateTime date,  String title,  String? notes,  double? weight,  String? veterinarianName,  String? clinicName,  String? diagnosis,  bool isHospitalization,  DateTime? dischargeDate,  String? parentId)  vetVisit,required TResult Function( String id,  String petId,  EventTypeDefinitionDto eventType,  DateTime date,  String title,  String? notes,  double? weight,  String drugName,  String dosage,  int frequencyValue,  int frequencyUnit,  DateTime startDate,  DateTime? endDate,  String? parentId)  medication,required TResult Function( String id,  String petId,  EventTypeDefinitionDto eventType,  DateTime date,  String title,  String? notes,  double? weight,  String vaccineName,  int frequencyValue,  int frequencyUnit,  String? parentId)  vaccine,required TResult Function( String id,  String petId,  EventTypeDefinitionDto eventType,  DateTime date,  String title,  String? notes,  double? weight,  int frequencyValue,  int frequencyUnit,  String? parentId)  custom,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String id,  String petId,  EventTypeDefinitionDto eventType,  DateTime date,  String title,  String? notes,  double? weight,  String? veterinarianName,  String? clinicName,  String? diagnosis,  bool isHospitalization,  DateTime? dischargeDate,  String? parentId,  bool hasCompletedOccurrences,  DateTime? endDate,  List<HealthEventOccurrenceDto>? occurrences)  vetVisit,required TResult Function( String id,  String petId,  EventTypeDefinitionDto eventType,  DateTime date,  String title,  String? notes,  double? weight,  String drugName,  String dosage,  int frequencyValue,  int frequencyUnit,  DateTime startDate,  String? parentId,  bool hasCompletedOccurrences,  DateTime? endDate,  List<HealthEventOccurrenceDto>? occurrences)  medication,required TResult Function( String id,  String petId,  EventTypeDefinitionDto eventType,  DateTime date,  String title,  String? notes,  double? weight,  String vaccineName,  int frequencyValue,  int frequencyUnit,  String? parentId,  bool hasCompletedOccurrences,  DateTime? endDate,  List<HealthEventOccurrenceDto>? occurrences)  vaccine,required TResult Function( String id,  String petId,  EventTypeDefinitionDto eventType,  DateTime date,  String title,  String? notes,  double? weight,  int frequencyValue,  int frequencyUnit,  String? parentId,  bool hasCompletedOccurrences,  DateTime? endDate,  List<HealthEventOccurrenceDto>? occurrences)  custom,}) {final _that = this;
 switch (_that) {
 case VetVisitEventDto():
-return vetVisit(_that.id,_that.petId,_that.eventType,_that.date,_that.title,_that.notes,_that.weight,_that.veterinarianName,_that.clinicName,_that.diagnosis,_that.isHospitalization,_that.dischargeDate,_that.parentId);case MedicationEventDto():
-return medication(_that.id,_that.petId,_that.eventType,_that.date,_that.title,_that.notes,_that.weight,_that.drugName,_that.dosage,_that.frequencyValue,_that.frequencyUnit,_that.startDate,_that.endDate,_that.parentId);case VaccineEventDto():
-return vaccine(_that.id,_that.petId,_that.eventType,_that.date,_that.title,_that.notes,_that.weight,_that.vaccineName,_that.frequencyValue,_that.frequencyUnit,_that.parentId);case CustomHealthEventDto():
-return custom(_that.id,_that.petId,_that.eventType,_that.date,_that.title,_that.notes,_that.weight,_that.frequencyValue,_that.frequencyUnit,_that.parentId);}
+return vetVisit(_that.id,_that.petId,_that.eventType,_that.date,_that.title,_that.notes,_that.weight,_that.veterinarianName,_that.clinicName,_that.diagnosis,_that.isHospitalization,_that.dischargeDate,_that.parentId,_that.hasCompletedOccurrences,_that.endDate,_that.occurrences);case MedicationEventDto():
+return medication(_that.id,_that.petId,_that.eventType,_that.date,_that.title,_that.notes,_that.weight,_that.drugName,_that.dosage,_that.frequencyValue,_that.frequencyUnit,_that.startDate,_that.parentId,_that.hasCompletedOccurrences,_that.endDate,_that.occurrences);case VaccineEventDto():
+return vaccine(_that.id,_that.petId,_that.eventType,_that.date,_that.title,_that.notes,_that.weight,_that.vaccineName,_that.frequencyValue,_that.frequencyUnit,_that.parentId,_that.hasCompletedOccurrences,_that.endDate,_that.occurrences);case CustomHealthEventDto():
+return custom(_that.id,_that.petId,_that.eventType,_that.date,_that.title,_that.notes,_that.weight,_that.frequencyValue,_that.frequencyUnit,_that.parentId,_that.hasCompletedOccurrences,_that.endDate,_that.occurrences);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -256,13 +259,13 @@ return custom(_that.id,_that.petId,_that.eventType,_that.date,_that.title,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String id,  String petId,  EventTypeDefinitionDto eventType,  DateTime date,  String title,  String? notes,  double? weight,  String? veterinarianName,  String? clinicName,  String? diagnosis,  bool isHospitalization,  DateTime? dischargeDate,  String? parentId)?  vetVisit,TResult? Function( String id,  String petId,  EventTypeDefinitionDto eventType,  DateTime date,  String title,  String? notes,  double? weight,  String drugName,  String dosage,  int frequencyValue,  int frequencyUnit,  DateTime startDate,  DateTime? endDate,  String? parentId)?  medication,TResult? Function( String id,  String petId,  EventTypeDefinitionDto eventType,  DateTime date,  String title,  String? notes,  double? weight,  String vaccineName,  int frequencyValue,  int frequencyUnit,  String? parentId)?  vaccine,TResult? Function( String id,  String petId,  EventTypeDefinitionDto eventType,  DateTime date,  String title,  String? notes,  double? weight,  int frequencyValue,  int frequencyUnit,  String? parentId)?  custom,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String id,  String petId,  EventTypeDefinitionDto eventType,  DateTime date,  String title,  String? notes,  double? weight,  String? veterinarianName,  String? clinicName,  String? diagnosis,  bool isHospitalization,  DateTime? dischargeDate,  String? parentId,  bool hasCompletedOccurrences,  DateTime? endDate,  List<HealthEventOccurrenceDto>? occurrences)?  vetVisit,TResult? Function( String id,  String petId,  EventTypeDefinitionDto eventType,  DateTime date,  String title,  String? notes,  double? weight,  String drugName,  String dosage,  int frequencyValue,  int frequencyUnit,  DateTime startDate,  String? parentId,  bool hasCompletedOccurrences,  DateTime? endDate,  List<HealthEventOccurrenceDto>? occurrences)?  medication,TResult? Function( String id,  String petId,  EventTypeDefinitionDto eventType,  DateTime date,  String title,  String? notes,  double? weight,  String vaccineName,  int frequencyValue,  int frequencyUnit,  String? parentId,  bool hasCompletedOccurrences,  DateTime? endDate,  List<HealthEventOccurrenceDto>? occurrences)?  vaccine,TResult? Function( String id,  String petId,  EventTypeDefinitionDto eventType,  DateTime date,  String title,  String? notes,  double? weight,  int frequencyValue,  int frequencyUnit,  String? parentId,  bool hasCompletedOccurrences,  DateTime? endDate,  List<HealthEventOccurrenceDto>? occurrences)?  custom,}) {final _that = this;
 switch (_that) {
 case VetVisitEventDto() when vetVisit != null:
-return vetVisit(_that.id,_that.petId,_that.eventType,_that.date,_that.title,_that.notes,_that.weight,_that.veterinarianName,_that.clinicName,_that.diagnosis,_that.isHospitalization,_that.dischargeDate,_that.parentId);case MedicationEventDto() when medication != null:
-return medication(_that.id,_that.petId,_that.eventType,_that.date,_that.title,_that.notes,_that.weight,_that.drugName,_that.dosage,_that.frequencyValue,_that.frequencyUnit,_that.startDate,_that.endDate,_that.parentId);case VaccineEventDto() when vaccine != null:
-return vaccine(_that.id,_that.petId,_that.eventType,_that.date,_that.title,_that.notes,_that.weight,_that.vaccineName,_that.frequencyValue,_that.frequencyUnit,_that.parentId);case CustomHealthEventDto() when custom != null:
-return custom(_that.id,_that.petId,_that.eventType,_that.date,_that.title,_that.notes,_that.weight,_that.frequencyValue,_that.frequencyUnit,_that.parentId);case _:
+return vetVisit(_that.id,_that.petId,_that.eventType,_that.date,_that.title,_that.notes,_that.weight,_that.veterinarianName,_that.clinicName,_that.diagnosis,_that.isHospitalization,_that.dischargeDate,_that.parentId,_that.hasCompletedOccurrences,_that.endDate,_that.occurrences);case MedicationEventDto() when medication != null:
+return medication(_that.id,_that.petId,_that.eventType,_that.date,_that.title,_that.notes,_that.weight,_that.drugName,_that.dosage,_that.frequencyValue,_that.frequencyUnit,_that.startDate,_that.parentId,_that.hasCompletedOccurrences,_that.endDate,_that.occurrences);case VaccineEventDto() when vaccine != null:
+return vaccine(_that.id,_that.petId,_that.eventType,_that.date,_that.title,_that.notes,_that.weight,_that.vaccineName,_that.frequencyValue,_that.frequencyUnit,_that.parentId,_that.hasCompletedOccurrences,_that.endDate,_that.occurrences);case CustomHealthEventDto() when custom != null:
+return custom(_that.id,_that.petId,_that.eventType,_that.date,_that.title,_that.notes,_that.weight,_that.frequencyValue,_that.frequencyUnit,_that.parentId,_that.hasCompletedOccurrences,_that.endDate,_that.occurrences);case _:
   return null;
 
 }
@@ -274,7 +277,7 @@ return custom(_that.id,_that.petId,_that.eventType,_that.date,_that.title,_that.
 @JsonSerializable()
 
 class VetVisitEventDto implements HealthEventDto {
-  const VetVisitEventDto({required this.id, required this.petId, required this.eventType, required this.date, required this.title, this.notes, this.weight, this.veterinarianName, this.clinicName, this.diagnosis, this.isHospitalization = false, this.dischargeDate, this.parentId,  String? $type}): $type = $type ?? 'VetVisit';
+  const VetVisitEventDto({required this.id, required this.petId, required this.eventType, required this.date, required this.title, this.notes, this.weight, this.veterinarianName, this.clinicName, this.diagnosis, this.isHospitalization = false, this.dischargeDate, this.parentId, this.hasCompletedOccurrences = false, this.endDate,  List<HealthEventOccurrenceDto>? occurrences,  String? $type}): _occurrences = occurrences,$type = $type ?? 'VetVisit';
   factory VetVisitEventDto.fromJson(Map<String, dynamic> json) => _$VetVisitEventDtoFromJson(json);
 
 @override final  String id;
@@ -290,6 +293,17 @@ class VetVisitEventDto implements HealthEventDto {
 @JsonKey() final  bool isHospitalization;
  final  DateTime? dischargeDate;
 @override final  String? parentId;
+@override@JsonKey() final  bool hasCompletedOccurrences;
+@override final  DateTime? endDate;
+ final  List<HealthEventOccurrenceDto>? _occurrences;
+@override List<HealthEventOccurrenceDto>? get occurrences {
+  final value = _occurrences;
+  if (value == null) return null;
+  if (_occurrences is EqualUnmodifiableListView) return _occurrences;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(value);
+}
+
 
 @JsonKey(name: 'healthEventType')
 final String $type;
@@ -308,18 +322,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is VetVisitEventDto&&(identical(other.id, id) || other.id == id)&&(identical(other.petId, petId) || other.petId == petId)&&(identical(other.eventType, eventType) || other.eventType == eventType)&&(identical(other.date, date) || other.date == date)&&(identical(other.title, title) || other.title == title)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.weight, weight) || other.weight == weight)&&(identical(other.veterinarianName, veterinarianName) || other.veterinarianName == veterinarianName)&&(identical(other.clinicName, clinicName) || other.clinicName == clinicName)&&(identical(other.diagnosis, diagnosis) || other.diagnosis == diagnosis)&&(identical(other.isHospitalization, isHospitalization) || other.isHospitalization == isHospitalization)&&(identical(other.dischargeDate, dischargeDate) || other.dischargeDate == dischargeDate)&&(identical(other.parentId, parentId) || other.parentId == parentId));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is VetVisitEventDto&&(identical(other.id, id) || other.id == id)&&(identical(other.petId, petId) || other.petId == petId)&&(identical(other.eventType, eventType) || other.eventType == eventType)&&(identical(other.date, date) || other.date == date)&&(identical(other.title, title) || other.title == title)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.weight, weight) || other.weight == weight)&&(identical(other.veterinarianName, veterinarianName) || other.veterinarianName == veterinarianName)&&(identical(other.clinicName, clinicName) || other.clinicName == clinicName)&&(identical(other.diagnosis, diagnosis) || other.diagnosis == diagnosis)&&(identical(other.isHospitalization, isHospitalization) || other.isHospitalization == isHospitalization)&&(identical(other.dischargeDate, dischargeDate) || other.dischargeDate == dischargeDate)&&(identical(other.parentId, parentId) || other.parentId == parentId)&&(identical(other.hasCompletedOccurrences, hasCompletedOccurrences) || other.hasCompletedOccurrences == hasCompletedOccurrences)&&(identical(other.endDate, endDate) || other.endDate == endDate)&&const DeepCollectionEquality().equals(other.occurrences, _occurrences));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,petId,eventType,date,title,notes,weight,veterinarianName,clinicName,diagnosis,isHospitalization,dischargeDate,parentId);
+    return Object.hash(runtimeType,id,petId,eventType,date,title,notes,weight,veterinarianName,clinicName,diagnosis,isHospitalization,dischargeDate,parentId,hasCompletedOccurrences,endDate,const DeepCollectionEquality().hash(_occurrences));
 }
 
 @override
 String toString() {
-    return 'HealthEventDto.vetVisit(id: $id, petId: $petId, eventType: $eventType, date: $date, title: $title, notes: $notes, weight: $weight, veterinarianName: $veterinarianName, clinicName: $clinicName, diagnosis: $diagnosis, isHospitalization: $isHospitalization, dischargeDate: $dischargeDate, parentId: $parentId)';
+    return 'HealthEventDto.vetVisit(id: $id, petId: $petId, eventType: $eventType, date: $date, title: $title, notes: $notes, weight: $weight, veterinarianName: $veterinarianName, clinicName: $clinicName, diagnosis: $diagnosis, isHospitalization: $isHospitalization, dischargeDate: $dischargeDate, parentId: $parentId, hasCompletedOccurrences: $hasCompletedOccurrences, endDate: $endDate, occurrences: $occurrences)';
 }
 
 
@@ -330,7 +344,7 @@ abstract mixin class $VetVisitEventDtoCopyWith<$Res> implements $HealthEventDtoC
   factory $VetVisitEventDtoCopyWith(VetVisitEventDto value, $Res Function(VetVisitEventDto) _then) = _$VetVisitEventDtoCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String petId, EventTypeDefinitionDto eventType, DateTime date, String title, String? notes, double? weight, String? veterinarianName, String? clinicName, String? diagnosis, bool isHospitalization, DateTime? dischargeDate, String? parentId
+ String id, String petId, EventTypeDefinitionDto eventType, DateTime date, String title, String? notes, double? weight, String? veterinarianName, String? clinicName, String? diagnosis, bool isHospitalization, DateTime? dischargeDate, String? parentId, bool hasCompletedOccurrences, DateTime? endDate, List<HealthEventOccurrenceDto>? occurrences
 });
 
 
@@ -347,7 +361,7 @@ class _$VetVisitEventDtoCopyWithImpl<$Res>
 
 /// Create a copy of HealthEventDto
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? petId = null,Object? eventType = null,Object? date = null,Object? title = null,Object? notes = freezed,Object? weight = freezed,Object? veterinarianName = freezed,Object? clinicName = freezed,Object? diagnosis = freezed,Object? isHospitalization = null,Object? dischargeDate = freezed,Object? parentId = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? petId = null,Object? eventType = null,Object? date = null,Object? title = null,Object? notes = freezed,Object? weight = freezed,Object? veterinarianName = freezed,Object? clinicName = freezed,Object? diagnosis = freezed,Object? isHospitalization = null,Object? dischargeDate = freezed,Object? parentId = freezed,Object? hasCompletedOccurrences = null,Object? endDate = freezed,Object? occurrences = freezed,}) {
   return _then(VetVisitEventDto(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,petId: null == petId ? _self.petId : petId // ignore: cast_nullable_to_non_nullable
@@ -362,7 +376,10 @@ as String?,diagnosis: freezed == diagnosis ? _self.diagnosis : diagnosis // igno
 as String?,isHospitalization: null == isHospitalization ? _self.isHospitalization : isHospitalization // ignore: cast_nullable_to_non_nullable
 as bool,dischargeDate: freezed == dischargeDate ? _self.dischargeDate : dischargeDate // ignore: cast_nullable_to_non_nullable
 as DateTime?,parentId: freezed == parentId ? _self.parentId : parentId // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,hasCompletedOccurrences: null == hasCompletedOccurrences ? _self.hasCompletedOccurrences : hasCompletedOccurrences // ignore: cast_nullable_to_non_nullable
+as bool,endDate: freezed == endDate ? _self.endDate : endDate // ignore: cast_nullable_to_non_nullable
+as DateTime?,occurrences: freezed == occurrences ? _self._occurrences : occurrences // ignore: cast_nullable_to_non_nullable
+as List<HealthEventOccurrenceDto>?,
   ));
 }
 
@@ -382,7 +399,7 @@ $EventTypeDefinitionDtoCopyWith<$Res> get eventType {
 @JsonSerializable()
 
 class MedicationEventDto implements HealthEventDto {
-  const MedicationEventDto({required this.id, required this.petId, required this.eventType, required this.date, required this.title, this.notes, this.weight, required this.drugName, required this.dosage, required this.frequencyValue, required this.frequencyUnit, required this.startDate, this.endDate, this.parentId,  String? $type}): $type = $type ?? 'Medication';
+  const MedicationEventDto({required this.id, required this.petId, required this.eventType, required this.date, required this.title, this.notes, this.weight, required this.drugName, required this.dosage, required this.frequencyValue, required this.frequencyUnit, required this.startDate, this.parentId, this.hasCompletedOccurrences = false, this.endDate,  List<HealthEventOccurrenceDto>? occurrences,  String? $type}): _occurrences = occurrences,$type = $type ?? 'Medication';
   factory MedicationEventDto.fromJson(Map<String, dynamic> json) => _$MedicationEventDtoFromJson(json);
 
 @override final  String id;
@@ -397,8 +414,18 @@ class MedicationEventDto implements HealthEventDto {
  final  int frequencyValue;
  final  int frequencyUnit;
  final  DateTime startDate;
- final  DateTime? endDate;
 @override final  String? parentId;
+@override@JsonKey() final  bool hasCompletedOccurrences;
+@override final  DateTime? endDate;
+ final  List<HealthEventOccurrenceDto>? _occurrences;
+@override List<HealthEventOccurrenceDto>? get occurrences {
+  final value = _occurrences;
+  if (value == null) return null;
+  if (_occurrences is EqualUnmodifiableListView) return _occurrences;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(value);
+}
+
 
 @JsonKey(name: 'healthEventType')
 final String $type;
@@ -417,18 +444,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is MedicationEventDto&&(identical(other.id, id) || other.id == id)&&(identical(other.petId, petId) || other.petId == petId)&&(identical(other.eventType, eventType) || other.eventType == eventType)&&(identical(other.date, date) || other.date == date)&&(identical(other.title, title) || other.title == title)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.weight, weight) || other.weight == weight)&&(identical(other.drugName, drugName) || other.drugName == drugName)&&(identical(other.dosage, dosage) || other.dosage == dosage)&&(identical(other.frequencyValue, frequencyValue) || other.frequencyValue == frequencyValue)&&(identical(other.frequencyUnit, frequencyUnit) || other.frequencyUnit == frequencyUnit)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.endDate, endDate) || other.endDate == endDate)&&(identical(other.parentId, parentId) || other.parentId == parentId));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is MedicationEventDto&&(identical(other.id, id) || other.id == id)&&(identical(other.petId, petId) || other.petId == petId)&&(identical(other.eventType, eventType) || other.eventType == eventType)&&(identical(other.date, date) || other.date == date)&&(identical(other.title, title) || other.title == title)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.weight, weight) || other.weight == weight)&&(identical(other.drugName, drugName) || other.drugName == drugName)&&(identical(other.dosage, dosage) || other.dosage == dosage)&&(identical(other.frequencyValue, frequencyValue) || other.frequencyValue == frequencyValue)&&(identical(other.frequencyUnit, frequencyUnit) || other.frequencyUnit == frequencyUnit)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.parentId, parentId) || other.parentId == parentId)&&(identical(other.hasCompletedOccurrences, hasCompletedOccurrences) || other.hasCompletedOccurrences == hasCompletedOccurrences)&&(identical(other.endDate, endDate) || other.endDate == endDate)&&const DeepCollectionEquality().equals(other.occurrences, _occurrences));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,petId,eventType,date,title,notes,weight,drugName,dosage,frequencyValue,frequencyUnit,startDate,endDate,parentId);
+    return Object.hash(runtimeType,id,petId,eventType,date,title,notes,weight,drugName,dosage,frequencyValue,frequencyUnit,startDate,parentId,hasCompletedOccurrences,endDate,const DeepCollectionEquality().hash(_occurrences));
 }
 
 @override
 String toString() {
-    return 'HealthEventDto.medication(id: $id, petId: $petId, eventType: $eventType, date: $date, title: $title, notes: $notes, weight: $weight, drugName: $drugName, dosage: $dosage, frequencyValue: $frequencyValue, frequencyUnit: $frequencyUnit, startDate: $startDate, endDate: $endDate, parentId: $parentId)';
+    return 'HealthEventDto.medication(id: $id, petId: $petId, eventType: $eventType, date: $date, title: $title, notes: $notes, weight: $weight, drugName: $drugName, dosage: $dosage, frequencyValue: $frequencyValue, frequencyUnit: $frequencyUnit, startDate: $startDate, parentId: $parentId, hasCompletedOccurrences: $hasCompletedOccurrences, endDate: $endDate, occurrences: $occurrences)';
 }
 
 
@@ -439,7 +466,7 @@ abstract mixin class $MedicationEventDtoCopyWith<$Res> implements $HealthEventDt
   factory $MedicationEventDtoCopyWith(MedicationEventDto value, $Res Function(MedicationEventDto) _then) = _$MedicationEventDtoCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String petId, EventTypeDefinitionDto eventType, DateTime date, String title, String? notes, double? weight, String drugName, String dosage, int frequencyValue, int frequencyUnit, DateTime startDate, DateTime? endDate, String? parentId
+ String id, String petId, EventTypeDefinitionDto eventType, DateTime date, String title, String? notes, double? weight, String drugName, String dosage, int frequencyValue, int frequencyUnit, DateTime startDate, String? parentId, bool hasCompletedOccurrences, DateTime? endDate, List<HealthEventOccurrenceDto>? occurrences
 });
 
 
@@ -456,7 +483,7 @@ class _$MedicationEventDtoCopyWithImpl<$Res>
 
 /// Create a copy of HealthEventDto
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? petId = null,Object? eventType = null,Object? date = null,Object? title = null,Object? notes = freezed,Object? weight = freezed,Object? drugName = null,Object? dosage = null,Object? frequencyValue = null,Object? frequencyUnit = null,Object? startDate = null,Object? endDate = freezed,Object? parentId = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? petId = null,Object? eventType = null,Object? date = null,Object? title = null,Object? notes = freezed,Object? weight = freezed,Object? drugName = null,Object? dosage = null,Object? frequencyValue = null,Object? frequencyUnit = null,Object? startDate = null,Object? parentId = freezed,Object? hasCompletedOccurrences = null,Object? endDate = freezed,Object? occurrences = freezed,}) {
   return _then(MedicationEventDto(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,petId: null == petId ? _self.petId : petId // ignore: cast_nullable_to_non_nullable
@@ -470,9 +497,11 @@ as String,dosage: null == dosage ? _self.dosage : dosage // ignore: cast_nullabl
 as String,frequencyValue: null == frequencyValue ? _self.frequencyValue : frequencyValue // ignore: cast_nullable_to_non_nullable
 as int,frequencyUnit: null == frequencyUnit ? _self.frequencyUnit : frequencyUnit // ignore: cast_nullable_to_non_nullable
 as int,startDate: null == startDate ? _self.startDate : startDate // ignore: cast_nullable_to_non_nullable
-as DateTime,endDate: freezed == endDate ? _self.endDate : endDate // ignore: cast_nullable_to_non_nullable
-as DateTime?,parentId: freezed == parentId ? _self.parentId : parentId // ignore: cast_nullable_to_non_nullable
-as String?,
+as DateTime,parentId: freezed == parentId ? _self.parentId : parentId // ignore: cast_nullable_to_non_nullable
+as String?,hasCompletedOccurrences: null == hasCompletedOccurrences ? _self.hasCompletedOccurrences : hasCompletedOccurrences // ignore: cast_nullable_to_non_nullable
+as bool,endDate: freezed == endDate ? _self.endDate : endDate // ignore: cast_nullable_to_non_nullable
+as DateTime?,occurrences: freezed == occurrences ? _self._occurrences : occurrences // ignore: cast_nullable_to_non_nullable
+as List<HealthEventOccurrenceDto>?,
   ));
 }
 
@@ -492,7 +521,7 @@ $EventTypeDefinitionDtoCopyWith<$Res> get eventType {
 @JsonSerializable()
 
 class VaccineEventDto implements HealthEventDto {
-  const VaccineEventDto({required this.id, required this.petId, required this.eventType, required this.date, required this.title, this.notes, this.weight, required this.vaccineName, required this.frequencyValue, required this.frequencyUnit, this.parentId,  String? $type}): $type = $type ?? 'Vaccine';
+  const VaccineEventDto({required this.id, required this.petId, required this.eventType, required this.date, required this.title, this.notes, this.weight, required this.vaccineName, required this.frequencyValue, required this.frequencyUnit, this.parentId, this.hasCompletedOccurrences = false, this.endDate,  List<HealthEventOccurrenceDto>? occurrences,  String? $type}): _occurrences = occurrences,$type = $type ?? 'Vaccine';
   factory VaccineEventDto.fromJson(Map<String, dynamic> json) => _$VaccineEventDtoFromJson(json);
 
 @override final  String id;
@@ -506,6 +535,17 @@ class VaccineEventDto implements HealthEventDto {
  final  int frequencyValue;
  final  int frequencyUnit;
 @override final  String? parentId;
+@override@JsonKey() final  bool hasCompletedOccurrences;
+@override final  DateTime? endDate;
+ final  List<HealthEventOccurrenceDto>? _occurrences;
+@override List<HealthEventOccurrenceDto>? get occurrences {
+  final value = _occurrences;
+  if (value == null) return null;
+  if (_occurrences is EqualUnmodifiableListView) return _occurrences;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(value);
+}
+
 
 @JsonKey(name: 'healthEventType')
 final String $type;
@@ -524,18 +564,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is VaccineEventDto&&(identical(other.id, id) || other.id == id)&&(identical(other.petId, petId) || other.petId == petId)&&(identical(other.eventType, eventType) || other.eventType == eventType)&&(identical(other.date, date) || other.date == date)&&(identical(other.title, title) || other.title == title)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.weight, weight) || other.weight == weight)&&(identical(other.vaccineName, vaccineName) || other.vaccineName == vaccineName)&&(identical(other.frequencyValue, frequencyValue) || other.frequencyValue == frequencyValue)&&(identical(other.frequencyUnit, frequencyUnit) || other.frequencyUnit == frequencyUnit)&&(identical(other.parentId, parentId) || other.parentId == parentId));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is VaccineEventDto&&(identical(other.id, id) || other.id == id)&&(identical(other.petId, petId) || other.petId == petId)&&(identical(other.eventType, eventType) || other.eventType == eventType)&&(identical(other.date, date) || other.date == date)&&(identical(other.title, title) || other.title == title)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.weight, weight) || other.weight == weight)&&(identical(other.vaccineName, vaccineName) || other.vaccineName == vaccineName)&&(identical(other.frequencyValue, frequencyValue) || other.frequencyValue == frequencyValue)&&(identical(other.frequencyUnit, frequencyUnit) || other.frequencyUnit == frequencyUnit)&&(identical(other.parentId, parentId) || other.parentId == parentId)&&(identical(other.hasCompletedOccurrences, hasCompletedOccurrences) || other.hasCompletedOccurrences == hasCompletedOccurrences)&&(identical(other.endDate, endDate) || other.endDate == endDate)&&const DeepCollectionEquality().equals(other.occurrences, _occurrences));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,petId,eventType,date,title,notes,weight,vaccineName,frequencyValue,frequencyUnit,parentId);
+    return Object.hash(runtimeType,id,petId,eventType,date,title,notes,weight,vaccineName,frequencyValue,frequencyUnit,parentId,hasCompletedOccurrences,endDate,const DeepCollectionEquality().hash(_occurrences));
 }
 
 @override
 String toString() {
-    return 'HealthEventDto.vaccine(id: $id, petId: $petId, eventType: $eventType, date: $date, title: $title, notes: $notes, weight: $weight, vaccineName: $vaccineName, frequencyValue: $frequencyValue, frequencyUnit: $frequencyUnit, parentId: $parentId)';
+    return 'HealthEventDto.vaccine(id: $id, petId: $petId, eventType: $eventType, date: $date, title: $title, notes: $notes, weight: $weight, vaccineName: $vaccineName, frequencyValue: $frequencyValue, frequencyUnit: $frequencyUnit, parentId: $parentId, hasCompletedOccurrences: $hasCompletedOccurrences, endDate: $endDate, occurrences: $occurrences)';
 }
 
 
@@ -546,7 +586,7 @@ abstract mixin class $VaccineEventDtoCopyWith<$Res> implements $HealthEventDtoCo
   factory $VaccineEventDtoCopyWith(VaccineEventDto value, $Res Function(VaccineEventDto) _then) = _$VaccineEventDtoCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String petId, EventTypeDefinitionDto eventType, DateTime date, String title, String? notes, double? weight, String vaccineName, int frequencyValue, int frequencyUnit, String? parentId
+ String id, String petId, EventTypeDefinitionDto eventType, DateTime date, String title, String? notes, double? weight, String vaccineName, int frequencyValue, int frequencyUnit, String? parentId, bool hasCompletedOccurrences, DateTime? endDate, List<HealthEventOccurrenceDto>? occurrences
 });
 
 
@@ -563,7 +603,7 @@ class _$VaccineEventDtoCopyWithImpl<$Res>
 
 /// Create a copy of HealthEventDto
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? petId = null,Object? eventType = null,Object? date = null,Object? title = null,Object? notes = freezed,Object? weight = freezed,Object? vaccineName = null,Object? frequencyValue = null,Object? frequencyUnit = null,Object? parentId = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? petId = null,Object? eventType = null,Object? date = null,Object? title = null,Object? notes = freezed,Object? weight = freezed,Object? vaccineName = null,Object? frequencyValue = null,Object? frequencyUnit = null,Object? parentId = freezed,Object? hasCompletedOccurrences = null,Object? endDate = freezed,Object? occurrences = freezed,}) {
   return _then(VaccineEventDto(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,petId: null == petId ? _self.petId : petId // ignore: cast_nullable_to_non_nullable
@@ -576,7 +616,10 @@ as double?,vaccineName: null == vaccineName ? _self.vaccineName : vaccineName //
 as String,frequencyValue: null == frequencyValue ? _self.frequencyValue : frequencyValue // ignore: cast_nullable_to_non_nullable
 as int,frequencyUnit: null == frequencyUnit ? _self.frequencyUnit : frequencyUnit // ignore: cast_nullable_to_non_nullable
 as int,parentId: freezed == parentId ? _self.parentId : parentId // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,hasCompletedOccurrences: null == hasCompletedOccurrences ? _self.hasCompletedOccurrences : hasCompletedOccurrences // ignore: cast_nullable_to_non_nullable
+as bool,endDate: freezed == endDate ? _self.endDate : endDate // ignore: cast_nullable_to_non_nullable
+as DateTime?,occurrences: freezed == occurrences ? _self._occurrences : occurrences // ignore: cast_nullable_to_non_nullable
+as List<HealthEventOccurrenceDto>?,
   ));
 }
 
@@ -596,7 +639,7 @@ $EventTypeDefinitionDtoCopyWith<$Res> get eventType {
 @JsonSerializable()
 
 class CustomHealthEventDto implements HealthEventDto {
-  const CustomHealthEventDto({required this.id, required this.petId, required this.eventType, required this.date, required this.title, this.notes, this.weight, required this.frequencyValue, required this.frequencyUnit, this.parentId,  String? $type}): $type = $type ?? 'Custom';
+  const CustomHealthEventDto({required this.id, required this.petId, required this.eventType, required this.date, required this.title, this.notes, this.weight, required this.frequencyValue, required this.frequencyUnit, this.parentId, this.hasCompletedOccurrences = false, this.endDate,  List<HealthEventOccurrenceDto>? occurrences,  String? $type}): _occurrences = occurrences,$type = $type ?? 'Custom';
   factory CustomHealthEventDto.fromJson(Map<String, dynamic> json) => _$CustomHealthEventDtoFromJson(json);
 
 @override final  String id;
@@ -609,6 +652,17 @@ class CustomHealthEventDto implements HealthEventDto {
  final  int frequencyValue;
  final  int frequencyUnit;
 @override final  String? parentId;
+@override@JsonKey() final  bool hasCompletedOccurrences;
+@override final  DateTime? endDate;
+ final  List<HealthEventOccurrenceDto>? _occurrences;
+@override List<HealthEventOccurrenceDto>? get occurrences {
+  final value = _occurrences;
+  if (value == null) return null;
+  if (_occurrences is EqualUnmodifiableListView) return _occurrences;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(value);
+}
+
 
 @JsonKey(name: 'healthEventType')
 final String $type;
@@ -627,18 +681,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is CustomHealthEventDto&&(identical(other.id, id) || other.id == id)&&(identical(other.petId, petId) || other.petId == petId)&&(identical(other.eventType, eventType) || other.eventType == eventType)&&(identical(other.date, date) || other.date == date)&&(identical(other.title, title) || other.title == title)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.weight, weight) || other.weight == weight)&&(identical(other.frequencyValue, frequencyValue) || other.frequencyValue == frequencyValue)&&(identical(other.frequencyUnit, frequencyUnit) || other.frequencyUnit == frequencyUnit)&&(identical(other.parentId, parentId) || other.parentId == parentId));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is CustomHealthEventDto&&(identical(other.id, id) || other.id == id)&&(identical(other.petId, petId) || other.petId == petId)&&(identical(other.eventType, eventType) || other.eventType == eventType)&&(identical(other.date, date) || other.date == date)&&(identical(other.title, title) || other.title == title)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.weight, weight) || other.weight == weight)&&(identical(other.frequencyValue, frequencyValue) || other.frequencyValue == frequencyValue)&&(identical(other.frequencyUnit, frequencyUnit) || other.frequencyUnit == frequencyUnit)&&(identical(other.parentId, parentId) || other.parentId == parentId)&&(identical(other.hasCompletedOccurrences, hasCompletedOccurrences) || other.hasCompletedOccurrences == hasCompletedOccurrences)&&(identical(other.endDate, endDate) || other.endDate == endDate)&&const DeepCollectionEquality().equals(other.occurrences, _occurrences));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,petId,eventType,date,title,notes,weight,frequencyValue,frequencyUnit,parentId);
+    return Object.hash(runtimeType,id,petId,eventType,date,title,notes,weight,frequencyValue,frequencyUnit,parentId,hasCompletedOccurrences,endDate,const DeepCollectionEquality().hash(_occurrences));
 }
 
 @override
 String toString() {
-    return 'HealthEventDto.custom(id: $id, petId: $petId, eventType: $eventType, date: $date, title: $title, notes: $notes, weight: $weight, frequencyValue: $frequencyValue, frequencyUnit: $frequencyUnit, parentId: $parentId)';
+    return 'HealthEventDto.custom(id: $id, petId: $petId, eventType: $eventType, date: $date, title: $title, notes: $notes, weight: $weight, frequencyValue: $frequencyValue, frequencyUnit: $frequencyUnit, parentId: $parentId, hasCompletedOccurrences: $hasCompletedOccurrences, endDate: $endDate, occurrences: $occurrences)';
 }
 
 
@@ -649,7 +703,7 @@ abstract mixin class $CustomHealthEventDtoCopyWith<$Res> implements $HealthEvent
   factory $CustomHealthEventDtoCopyWith(CustomHealthEventDto value, $Res Function(CustomHealthEventDto) _then) = _$CustomHealthEventDtoCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String petId, EventTypeDefinitionDto eventType, DateTime date, String title, String? notes, double? weight, int frequencyValue, int frequencyUnit, String? parentId
+ String id, String petId, EventTypeDefinitionDto eventType, DateTime date, String title, String? notes, double? weight, int frequencyValue, int frequencyUnit, String? parentId, bool hasCompletedOccurrences, DateTime? endDate, List<HealthEventOccurrenceDto>? occurrences
 });
 
 
@@ -666,7 +720,7 @@ class _$CustomHealthEventDtoCopyWithImpl<$Res>
 
 /// Create a copy of HealthEventDto
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? petId = null,Object? eventType = null,Object? date = null,Object? title = null,Object? notes = freezed,Object? weight = freezed,Object? frequencyValue = null,Object? frequencyUnit = null,Object? parentId = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? petId = null,Object? eventType = null,Object? date = null,Object? title = null,Object? notes = freezed,Object? weight = freezed,Object? frequencyValue = null,Object? frequencyUnit = null,Object? parentId = freezed,Object? hasCompletedOccurrences = null,Object? endDate = freezed,Object? occurrences = freezed,}) {
   return _then(CustomHealthEventDto(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,petId: null == petId ? _self.petId : petId // ignore: cast_nullable_to_non_nullable
@@ -678,7 +732,10 @@ as String?,weight: freezed == weight ? _self.weight : weight // ignore: cast_nul
 as double?,frequencyValue: null == frequencyValue ? _self.frequencyValue : frequencyValue // ignore: cast_nullable_to_non_nullable
 as int,frequencyUnit: null == frequencyUnit ? _self.frequencyUnit : frequencyUnit // ignore: cast_nullable_to_non_nullable
 as int,parentId: freezed == parentId ? _self.parentId : parentId // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,hasCompletedOccurrences: null == hasCompletedOccurrences ? _self.hasCompletedOccurrences : hasCompletedOccurrences // ignore: cast_nullable_to_non_nullable
+as bool,endDate: freezed == endDate ? _self.endDate : endDate // ignore: cast_nullable_to_non_nullable
+as DateTime?,occurrences: freezed == occurrences ? _self._occurrences : occurrences // ignore: cast_nullable_to_non_nullable
+as List<HealthEventOccurrenceDto>?,
   ));
 }
 
