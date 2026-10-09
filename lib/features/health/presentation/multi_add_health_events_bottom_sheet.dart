@@ -415,7 +415,14 @@ class _MultiAddHealthEventsBottomSheetState extends ConsumerState<MultiAddHealth
               final d = await showDatePicker(context: context, initialDate: data.date, firstDate: DateTime(2000), lastDate: DateTime(2100));
               if (d != null) {
                 if (!mounted) return;
-                final t = await showTimePicker(context: context, initialTime: TimeOfDay.fromDateTime(data.date));
+                final t = await showTimePicker(
+                  context: context, 
+                  initialTime: TimeOfDay.fromDateTime(data.date),
+                  builder: (context, child) => MediaQuery(
+                    data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+                    child: child!,
+                  ),
+                );
                 if (t != null) {
                   setState(() => data.date = DateTime(d.year, d.month, d.day, t.hour, t.minute));
                 }
